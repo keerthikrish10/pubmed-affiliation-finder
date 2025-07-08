@@ -3,6 +3,15 @@ import json
 from typing import Optional, Tuple
 from .utils import get_logger
 import google.generativeai as genai
+from functools import lru_cache
+from dotenv import load_dotenv
+import os
+
+# Load environment variables (e.g. GOOGLE_API_KEY)
+load_dotenv()
+
+# Configure Gemini API key
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 logger = get_logger()
 
@@ -18,18 +27,24 @@ ACADEMIC_KEYWORDS = [
     "clinic", "national lab"
 ]
 
+
 def is_non_academic_rule_based(affiliation: str) -> bool:
     affil_clean = re.sub(r"[^\w\s]", "", affiliation.lower())
     if any(kw in affil_clean for kw in ACADEMIC_KEYWORDS):
         return False
     return any(kw in affil_clean for kw in NON_ACADEMIC_KEYWORDS)
 
-def classify_affiliation_llm(affiliation: str, debug: bool = False) -> Tuple[bool, Optional[str]]:
-    try:
-        prompt = f"""
+
+# Caching the LLM classification results for repeated affiliations
+@lru_cache(maxsize=512)
+def classify_affiliation_llm_cached(affil: str) -> str:
+    """
+    Helper function for caching. Wraps the original classify logic and returns JSON string.
+    """
+    prompt = f"""
 You're an expert at analyzing research author affiliations. Given the affiliation below, answer whether it's from a pharmaceutical, biotech, or private healthcare company.
 
-Affiliation: "{affiliation}"
+Affiliation: "{affil}"
 
 Please reply with only this strict JSON (no markdown, no comments):
 
@@ -38,21 +53,26 @@ Please reply with only this strict JSON (no markdown, no comments):
   "company_name": "Company Name if non-academic, else null"
 }}
 """
-        model = genai.GenerativeModel("gemini-pro")
-        response = model.generate_content(prompt)
-        raw = response.text.strip()
+    model = genai.GenerativeModel("gemini-pro")
+    response = model.generate_content(prompt)
+    raw = response.text.strip()
+    json_part = raw[raw.find("{"):raw.rfind("}")+1]
+    return json_part
 
-        json_part = raw[raw.find("{"):raw.rfind("}")+1]
+
+def classify_affiliation_llm(affiliation: str, debug: bool = False) -> Tuple[bool, Optional[str]]:
+    try:
+        json_part = classify_affiliation_llm_cached(affiliation)
         result = json.loads(json_part)
 
         if debug:
             logger.debug(f"LLM result for '{affiliation}': {result}")
 
         return result.get("is_non_academic", False), result.get("company_name")
-
     except Exception as e:
         logger.error(f"LLM classification failed for '{affiliation}': {e}")
         return False, None
+
 
 def identify_non_academic_authors(authors, debug: bool = False, use_llm: bool = True):
     non_academic_authors = []
@@ -66,8 +86,8 @@ def identify_non_academic_authors(authors, debug: bool = False, use_llm: bool = 
             continue
 
         is_non_academic = is_non_academic_rule_based(affil)
-
         company = None
+
         if not is_non_academic and use_llm:
             is_non_academic, company = classify_affiliation_llm(affil, debug)
 

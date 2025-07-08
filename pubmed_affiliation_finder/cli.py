@@ -1,13 +1,18 @@
 import typer
-from dotenv import load_dotenv
+import os
 from pubmed_affiliation_finder.fetcher import fetch_pubmed_ids, fetch_pubmed_metadata
 from pubmed_affiliation_finder.parser import parse_pubmed_xml
 from pubmed_affiliation_finder.affiliation_checker import identify_non_academic_authors
 from pubmed_affiliation_finder.exporter import export_to_csv, print_to_console
 from pubmed_affiliation_finder.utils import setup_logging, get_logger
-
+from dotenv import load_dotenv
+from pathlib import Path
+load_dotenv()
 app = typer.Typer()
 logger = get_logger()
+
+# Load environment variables at the top level
+load_dotenv()
 
 @app.command()
 def main(
@@ -17,10 +22,14 @@ def main(
     no_llm: bool = typer.Option(False, "--no-llm", help="Disable LLM fallback.")
 ):
     setup_logging(debug)
-    load_dotenv()
+
+    # Ensure API key is set
+    if not no_llm and not os.getenv("GOOGLE_API_KEY"):
+        logger.error("❌ GOOGLE_API_KEY not found. Please set it in your .env file or environment variables.")
+        raise typer.Exit(code=1)
 
     try:
-        print("🔍 Searching PubMed for:", query)
+        typer.echo(f"🔍 Searching PubMed for: '{query}'")
         ids = fetch_pubmed_ids(query)
         if not ids:
             logger.warning("⚠️ No PubMed IDs found. Please refine your query.")
@@ -32,7 +41,9 @@ def main(
         results = []
         for article in articles:
             authors = article.get("authors", [])
-            non_acad_authors, companies = identify_non_academic_authors(authors, debug=debug, use_llm=not no_llm)
+            non_acad_authors, companies = identify_non_academic_authors(
+                authors, debug=debug, use_llm=not no_llm
+            )
 
             if non_acad_authors:
                 results.append({
@@ -46,13 +57,18 @@ def main(
 
         if file:
             export_to_csv(results, file)
-            print(f"✅ Saved {len(results)} results to {file}")
+            typer.echo(f"✅ Saved {len(results)} result(s) to: {file}")
         else:
             print_to_console(results)
 
-    except Exception as e:
-        logger.error(f"Unexpected error: {e}")
+    except KeyboardInterrupt:
+        typer.echo("❗ Interrupted by user. Exiting.")
         raise typer.Exit(code=1)
+
+    except Exception as e:
+        logger.error(f"❌ Unexpected error: {e}")
+        raise typer.Exit(code=1)
+
 
 if __name__ == "__main__":
     app()
