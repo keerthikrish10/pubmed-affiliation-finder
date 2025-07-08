@@ -57,16 +57,16 @@ def main(
 
         if file:
             export_to_csv(results, file)
-            typer.echo(f"✅ Saved {len(results)} result(s) to: {file}")
+            typer.echo(f" Saved {len(results)} result(s) to: {file}")
         else:
             print_to_console(results)
 
     except KeyboardInterrupt:
-        typer.echo("❗ Interrupted by user. Exiting.")
+        typer.echo(" Interrupted by user. Exiting.")
         raise typer.Exit(code=1)
 
     except Exception as e:
-        logger.error(f"❌ Unexpected error: {e}")
+        logger.error(f" Unexpected error: {e}")
         raise typer.Exit(code=1)
 
 
