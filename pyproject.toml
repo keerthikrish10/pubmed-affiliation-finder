@@ -1,6 +1,6 @@
 [project]
 name = "pubmed-affiliation-finder"
-version = "0.1.0"
+version = "0.1.1"
 description = "Fetch PubMed papers with non-academic authors from pharma/biotech companies."
 requires-python = ">=3.9"
 
