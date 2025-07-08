@@ -56,6 +56,7 @@ This tool allows researchers and analysts to:
 - Export the results to a **CSV** or print to console
 - Published to testPYPI as a package
 - Git for version control
+- Pytest for unit testing 
 
 ### ✨ Key Features
 
@@ -69,9 +70,11 @@ This tool allows researchers and analysts to:
 | 🐍 CLI Powered | Fast and customizable Typer-based CLI |
 | 📄 .env Support | Gemini API key via environment variables |
 | PYPI | Publishd to testPYPI as a package|
+| PYTest | for unit testing |
 |-h or --help| Display usage instructions|
 |-d or --debug| Print debug information during execution|
 |-f or --file| Specify the lename to save the results|
+
 
 ---
 
@@ -133,6 +136,17 @@ python -m pubmed_affiliation_finder.cli "covid vaccine 2023" --file result.csv
                 (OR)
 get-papers-list "cancer vaccine 2024" --file result.csv --debug
 
+#### Unit Testing iwth PYTEST:
+
+From your terminal, run:
+
+pip install -e .
+
+ Run All Tests:
+
+set PYTHONPATH=.
+pytest tests/
+
 #### Flag	Description:
 
 --debug	Show detailed logs
@@ -141,16 +155,20 @@ get-papers-list "cancer vaccine 2024" --file result.csv --debug
 
 #### 📄 Project Structure
 
-pubmed_affiliation_finder/
-├── affiliation_checker.py  # Rule + LLM logic
-├── cli.py                  # Main CLI entry
-├── fetcher.py              # PubMed ID + metadata fetch
-├── parser.py               # XML parsing
-├── exporter.py             # CSV + console output
-├── utils.py                # Logging, helpers
-.env                        # Gemini key (not committed)
-requirements.txt            # For pip
-pyproject.toml              # For poetry
+Pubmed_paper_fetcher_tool/
+├── pubmed_affiliation_finder/
+│   ├── __init__.py
+│   ├── parser.py
+│   ├── fetcher.py
+│   ├── affiliation_checker.py
+│   ├── utils.py
+├── tests/
+│   ├── __init__.py
+│   ├── test_parser.py
+│   ├── test_fetcher.py
+│   ├── test_checker.py
+├── pyproject.toml or requirements.txt
+
 
 #### 🛠️ Roadmap:
 
