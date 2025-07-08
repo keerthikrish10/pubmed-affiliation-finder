@@ -1,10 +1,11 @@
 from typing import List, Dict, Optional
 import xml.etree.ElementTree as ET
 import re
+from .utils import get_logger
 
+logger = get_logger()
 
 def extract_email_for_author(name: str, affiliation: str) -> Optional[str]:
-    """Extract email from affiliation if it matches the author's name."""
     email_match = re.search(r"[\w\.-]+@[\w\.-]+\.\w+", affiliation)
     if email_match:
         email = email_match.group(0)
@@ -13,9 +14,7 @@ def extract_email_for_author(name: str, affiliation: str) -> Optional[str]:
             return email
     return None
 
-
 def extract_email_by_company(affiliation: str) -> Optional[str]:
-    """Extract email based on company name match with email domain or username."""
     email_match = re.search(r"[\w\.-]+@[\w\.-]+\.\w+", affiliation)
     if not email_match:
         return None
@@ -24,15 +23,12 @@ def extract_email_by_company(affiliation: str) -> Optional[str]:
     domain_part = email.split("@")[1].split(".")[0].lower()
     user_part = email.split("@")[0].lower()
 
-    # Now match the domain or user part with words in the affiliation
     affil_clean = re.sub(r"[^a-zA-Z0-9 ]", " ", affiliation).lower()
     affil_words = set(affil_clean.split())
 
     if domain_part in affil_words or user_part in affil_words:
         return email
-
     return None
-
 
 def parse_pubmed_xml(xml_root: ET.Element) -> List[Dict]:
     articles = []
@@ -58,24 +54,23 @@ def parse_pubmed_xml(xml_root: ET.Element) -> List[Dict]:
                     })
 
                     if not corresponding_email:
-                        # First try matching email with author's name
                         email = extract_email_for_author(full_name, affil)
                         if not email:
-                            # Fallback: match company name with email
                             email = extract_email_by_company(affil)
 
                         if email:
                             corresponding_email = email
 
             articles.append({
-                "pmid": pmid,
-                "title": title,
+                "pmid": pmid or "N/A",
+                "title": title or "No Title",
                 "pub_date": pub_date,
                 "authors": authors,
                 "email": corresponding_email
             })
 
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Error parsing article: {e}")
             continue
 
     return articles

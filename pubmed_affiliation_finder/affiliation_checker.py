@@ -6,7 +6,6 @@ import google.generativeai as genai
 
 logger = get_logger()
 
-# Define keyword lists
 NON_ACADEMIC_KEYWORDS = [
     "inc", "pharma", "biotech", "gmbh", "ltd", "llc", "corp",
     "therapeutics", "biosciences", "laboratories", "research center",
@@ -20,16 +19,12 @@ ACADEMIC_KEYWORDS = [
 ]
 
 def is_non_academic_rule_based(affiliation: str) -> bool:
-    """Use basic heuristics to identify non-academic affiliations."""
     affil_clean = re.sub(r"[^\w\s]", "", affiliation.lower())
-
     if any(kw in affil_clean for kw in ACADEMIC_KEYWORDS):
         return False
     return any(kw in affil_clean for kw in NON_ACADEMIC_KEYWORDS)
 
-
 def classify_affiliation_llm(affiliation: str, debug: bool = False) -> Tuple[bool, Optional[str]]:
-    """Use Gemini Pro LLM to classify an affiliation as non-academic."""
     try:
         prompt = f"""
 You're an expert at analyzing research author affiliations. Given the affiliation below, answer whether it's from a pharmaceutical, biotech, or private healthcare company.
@@ -43,12 +38,10 @@ Please reply with only this strict JSON (no markdown, no comments):
   "company_name": "Company Name if non-academic, else null"
 }}
 """
-
         model = genai.GenerativeModel("gemini-pro")
         response = model.generate_content(prompt)
         raw = response.text.strip()
 
-        # Safely extract JSON portion
         json_part = raw[raw.find("{"):raw.rfind("}")+1]
         result = json.loads(json_part)
 
@@ -61,9 +54,7 @@ Please reply with only this strict JSON (no markdown, no comments):
         logger.error(f"LLM classification failed for '{affiliation}': {e}")
         return False, None
 
-
 def identify_non_academic_authors(authors, debug: bool = False, use_llm: bool = True):
-    """Return a list of non-academic authors and their company affiliations."""
     non_academic_authors = []
     companies = set()
 
@@ -74,10 +65,8 @@ def identify_non_academic_authors(authors, debug: bool = False, use_llm: bool = 
         if not name or not affil:
             continue
 
-        # Step 1: Rule-based check
         is_non_academic = is_non_academic_rule_based(affil)
 
-        # Step 2: Fallback to LLM
         company = None
         if not is_non_academic and use_llm:
             is_non_academic, company = classify_affiliation_llm(affil, debug)
