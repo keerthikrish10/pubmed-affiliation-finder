@@ -1,11 +1,28 @@
+# Environment and credentials
 .env
+
+# Python artifacts
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.sqlite3
+
+# Virtual environment
+venv/
+
+# Logs and outputs
 *.log
 *.csv
+*.sqlite3
+
+# Build artifacts
 dist/
 build/
 *.egg-info/
+
+# VS Code editor settings
+.vscode/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
