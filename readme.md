@@ -55,6 +55,7 @@ This tool allows researchers and analysts to:
 - Use **rule-based heuristics** + **Google Gemini Pro** to detect pharma, biotech, or healthcare contributors  
 - Export the results to a **CSV** or print to console
 - Published to testPYPI as a package
+- Git for version control
 
 ### ✨ Key Features
 
@@ -62,11 +63,16 @@ This tool allows researchers and analysts to:
 |--------|-------------|
 | 🔍 PubMed Search | Query papers using any keyword |
 | 🧠 LLM Integration | Uses Google Gemini API to classify affiliation |
-| 🏥 Industry Detector | Identifies private sector companies in research |
+| GIT | For version control |
+| 🏥 Industry Detector | Identifies Public and  private sector companies in research |
 | 📊 CSV Export | Save structured results for analysis |
 | 🐍 CLI Powered | Fast and customizable Typer-based CLI |
 | 📄 .env Support | Gemini API key via environment variables |
 | PYPI | Publishd to testPYPI as a package|
+|-h or --help| Display usage instructions|
+|-d or --debug| Print debug information during execution|
+|-f or --file| Specify the lename to save the results|
+
 ---
 
 ## 🏗️ Built With
@@ -95,7 +101,7 @@ This tool allows researchers and analysts to:
 
 ### ⚙️ Installation
 
-#### Option A: With `pip`
+#### step -1: With `pip`
 
 ```bash
 git clone https://github.com/your_username/pubmed-affiliation-finder.git
@@ -104,54 +110,37 @@ python -m venv venv
 source venv/bin/activate      # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
-Option B: With Poetry
-bash
-Copy
-Edit
+#### step -2: With 'Poetry'
+
 poetry install
 poetry shell
-🔑 Add Your .env File
 Create a .env file at the root:
-
-ini
-Copy
-Edit
 GOOGLE_API_KEY=your_google_api_key
-🧠 Usage
-bash
-Copy
-Edit
-python pubmed_affiliation_finder/cli.py "covid vaccine 2023" --file results.csv --debug
-Or with Poetry:
 
-bash
-Copy
-Edit
+#### 🧠 Usage from local machine
+
+#### with Poetry:
+
 poetry run get-papers-list "covid vaccine 2023" --file results.csv --debug
-Optional flags:
 
-Flag	Description
+#### 🧪 Run From TestPyPI
+#### To test from the cloud:
+
+pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple pubmed-affiliation-finder
+Then run:
+
+python -m pubmed_affiliation_finder.cli "covid vaccine 2023" --file result.csv
+                (OR)
+get-papers-list "cancer vaccine 2024" --file result.csv --debug
+
+#### Flag	Description:
+
 --debug	Show detailed logs
 --no-llm	Disable Gemini fallback
 --file	Save results to CSV
 
-🧪 Run From TestPyPI
-To test from the cloud:
+#### 📄 Project Structure
 
-bash
-Copy
-Edit
-pip install --index-url https://test.pypi.org/simple/ pubmed-affiliation-finder
-Then run:
-
-bash
-Copy
-Edit
-get-papers-list "diabetes insulin 2024" --file output.csv
-📄 Project Structure
-bash
-Copy
-Edit
 pubmed_affiliation_finder/
 ├── affiliation_checker.py  # Rule + LLM logic
 ├── cli.py                  # Main CLI entry
@@ -162,7 +151,9 @@ pubmed_affiliation_finder/
 .env                        # Gemini key (not committed)
 requirements.txt            # For pip
 pyproject.toml              # For poetry
-🛠️ Roadmap
+
+#### 🛠️ Roadmap:
+
  Fetch and parse PubMed metadata
 
  Rule-based affiliation filtering
@@ -175,11 +166,10 @@ pyproject.toml              # For poetry
 
  Test suite & coverage
 
- Web dashboard (optional)
+ Test PYPI deployment
 
- HuggingFace Space deployment
+#### 🤝 Contributing:
 
-🤝 Contributing
 Contributions are welcome!
 
 Fork the repo
@@ -192,16 +182,15 @@ Push to GitHub (git push origin feature/new-feature)
 
 Create a pull request
 
-📬 Contact
+#### 📬 Contact
 <div align="center">
 Keerthi Krishna
 🎓 AI/ML Engineer — VIT Chennai
 📧 skeerthi.krish@gmail.com
-🔗 GitHub
-🔗 LinkedIn
 
 </div>
-📄 License
+
+#### 📄 License
 Distributed under the MIT License.
 
 <div align="center"> <strong>⭐ If you found this tool helpful, give it a star on GitHub!</strong><br/> <img src="https://api.star-history.com/svg?repos=your_username/pubmed-affiliation-finder&type=Date" width="600"/> </div> ```
