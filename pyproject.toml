@@ -17,7 +17,7 @@ dependencies = [
 ]
 
 [project.scripts]
-get-papers-list = "cli:app"
+get-papers-list = "main_cli:app"
 
 [build-system]
 requires = ["poetry-core"]
