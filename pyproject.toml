@@ -1,0 +1,24 @@
+[project]
+name = "pubmed-affiliation-finder"
+version = "0.1.0"
+description = "Fetch PubMed papers with non-academic authors from pharma/biotech companies."
+requires-python = ">=3.9"
+
+authors = [
+  { name = "Keerthi Krishna", email = "skeerthi.krish@email.com" }
+]
+
+dependencies = [
+    "requests>=2.31",
+    "typer[all]>=0.9",
+    "pandas>=2.2",
+    "python-dotenv>=1.0",
+    "google-generativeai>=0.3.2"
+]
+
+[project.scripts]
+get-papers-list = "cli:app"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
