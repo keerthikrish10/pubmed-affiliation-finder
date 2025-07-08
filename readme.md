@@ -147,6 +147,22 @@ pip install -e .
 set PYTHONPATH=.
 pytest tests/
 
+#### Version Control using GIT commands:
+
+cd C:\Users\KEERTHI KRISHANA\OneDrive\Documents\Pubmed_paper_fetcher_tool
+git init
+
+Create a .gitignore file
+
+git remote add origin https://github.com/your-username/pubmed-affiliation-finder.git
+
+git add .
+git commit -m "Initial commit: PubMed affiliation finder tool"
+
+git branch -M main
+git push -u origin main
+
+
 #### Flag	Description:
 
 --debug	Show detailed logs
