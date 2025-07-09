@@ -56,7 +56,8 @@ This tool allows researchers and analysts to:
 - Export the results to a **CSV** or print to console
 - Published to testPYPI as a package
 - Git for version control
-- Pytest for unit testing 
+- Pytest for unit testing
+- Fine tuned LLM using SFT(supervised fine tuning)
 
 ### ✨ Key Features
 
@@ -74,7 +75,7 @@ This tool allows researchers and analysts to:
 |-h or --help| Display usage instructions|
 |-d or --debug| Print debug information during execution|
 |-f or --file| Specify the lename to save the results|
-
+|SFT | supervised fine tuning of LLM |
 
 ---
 
